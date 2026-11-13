@@ -1,6 +1,6 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-minVersion = '10.10'
+minVersion = '12.0'
 
 platform :osx, minVersion
 
@@ -11,10 +11,8 @@ plugin 'cocoapods-prune-localizations', { :localizations => supported_locales }
 target "SelfControl" do
     use_frameworks! :linkage => :static
     pod 'MASPreferences', '~> 1.1.4'
-    pod 'TransformerKit', '~> 1.1.1'
     pod 'FormatterKit/TimeIntervalFormatter', '~> 1.8.0'
     pod 'LetsMove', '~> 1.24'
-    pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '7.3.0'
     
     # Add test target
     target 'SelfControlTests' do
@@ -24,22 +22,27 @@ end
 
 target "SelfControl Killer" do
     use_frameworks! :linkage => :static
-    pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '7.3.0'
 end
 
-# we can't use_frameworks on these because they're command-line tools
-# Sentry says we need use_frameworks, but they seem to work OK anyway?
+# Sentry was removed: crash reporting is disabled in this fork, and Sentry 7.x no longer
+# compiles with current Xcode. These targets have no pods but stay listed so CocoaPods
+# keeps managing their build settings. SCSentry compiles to no-ops without the pod.
 target "SCKillerHelper" do
-    pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '7.3.0'
 end
 target "selfcontrol-cli" do
-    pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '7.3.0'
 end
 target "org.eyebeam.selfcontrold" do
-    pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '7.3.0'
 end
 
 post_install do |pi|
+   # CocoaPods' resource-copy script expects static frameworks to have iOS-style flat resources
+   # (Foo.framework/en.lproj/...), but macOS frameworks keep them under Foo.framework/Resources/.
+   Dir.glob('Pods/Target Support Files/*/*-resources.sh').each do |script|
+       src = File.read(script)
+       fixed = src.gsub(%r{\.framework/(?!Resources/|Versions/)([^"/]+\.lproj/)}, '.framework/Resources/\1')
+       File.write(script, fixed) if fixed != src
+   end
+
    pi.pods_project.targets.each do |t|
        t.build_configurations.each do |bc|
            if Gem::Version.new(bc.build_settings['MACOSX_DEPLOYMENT_TARGET']) < Gem::Version.new(minVersion)

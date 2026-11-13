@@ -8,8 +8,9 @@
 #import "SCSentry.h"
 #import "SCSettings.h"
 
-#ifndef TESTING
+#if !defined(TESTING) && __has_include(<Sentry/Sentry.h>)
 #import <Sentry/Sentry.h>
+#define SC_SENTRY_AVAILABLE 1
 #endif
 
 @implementation SCSentry
@@ -20,7 +21,7 @@ static NSString* const kSentryDSN = nil;
 
 //org.eyebeam.SelfControl
 + (void)startSentry:(NSString*)componentId {
-#ifndef TESTING
+#ifdef SC_SENTRY_AVAILABLE
     if (kSentryDSN == nil) return;
     [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
         options.dsn = kSentryDSN;
@@ -119,7 +120,7 @@ static NSString* const kSentryDSN = nil;
     [defaultsDict removeObjectForKey: @"SULastCheckTime"];
     [defaultsDict removeObjectForKey: @"SULastProfileSubmissionDate"];
 
-#ifndef TESTING
+#ifdef SC_SENTRY_AVAILABLE
     [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
         [scope setContextValue: defaultsDict forKey: @"NSUserDefaults"];
     }];
@@ -127,7 +128,7 @@ static NSString* const kSentryDSN = nil;
 }
 
 + (void)addBreadcrumb:(NSString*)message category:(NSString*)category {
-#ifndef TESTING
+#ifdef SC_SENTRY_AVAILABLE
     SentryBreadcrumb* crumb = [[SentryBreadcrumb alloc] init];
     crumb.level = kSentryLevelInfo;
     crumb.category = category;
@@ -153,7 +154,7 @@ static NSString* const kSentryDSN = nil;
     NSLog(@"Reporting error %@ to Sentry...", error);
     [[SCSettings sharedSettings] updateSentryContext];
     [SCSentry updateDefaultsContext];
-#ifndef TESTING
+#ifdef SC_SENTRY_AVAILABLE
     [SentrySDK captureError: error];
 #endif
 }
@@ -176,7 +177,7 @@ static NSString* const kSentryDSN = nil;
     [[SCSettings sharedSettings] updateSentryContext];
     [SCSentry updateDefaultsContext];
     
-#ifndef TESTING
+#ifdef SC_SENTRY_AVAILABLE
     if (block != nil) {
         [SentrySDK captureMessage: message withScopeBlock: block];
     } else {

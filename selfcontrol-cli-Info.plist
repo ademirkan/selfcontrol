@@ -53,7 +53,7 @@
 	<key>SMPrivilegedExecutables</key>
 	<dict>
 		<key>org.eyebeam.selfcontrold</key>
-		<string>anchor apple generic and identifier &quot;org.eyebeam.selfcontrold&quot; and certificate leaf[subject.OU] = YOURTEAMID</string>
+		<string>anchor apple generic and identifier &quot;org.eyebeam.selfcontrold&quot; and certificate leaf[subject.OU] = RV8C69662G</string>
 	</dict>
 </dict>
 </plist>

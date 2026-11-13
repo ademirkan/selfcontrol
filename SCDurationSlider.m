@@ -7,9 +7,24 @@
 
 #import "SCDurationSlider.h"
 #import "SCTimeIntervalFormatter.h"
-#import <TransformerKit/NSValueTransformer+TransformerKit.h>
-
 #define kValueTransformerName @"BlockDurationSliderTransformer"
+
+// Rounds the slider's float value to a whole number of minutes.
+// (Replaces the block-based transformer we used to get from TransformerKit.)
+@interface SCRoundedMinutesValueTransformer : NSValueTransformer
+@end
+
+@implementation SCRoundedMinutesValueTransformer
++ (Class)transformedValueClass { return [NSNumber class]; }
++ (BOOL)allowsReverseTransformation { return NO; }
+- (id)transformedValue:(id)value {
+    // if it's not a number or convertable to one, IDK man
+    if (![value respondsToSelector: @selector(floatValue)]) return @0;
+
+    long minutesValue = lroundf([value floatValue]);
+    return @(minutesValue);
+}
+@end
 
 @implementation SCDurationSlider
 
@@ -47,15 +62,9 @@
 }
 
 - (void)registerMinutesValueTransformer {
-    [NSValueTransformer registerValueTransformerWithName: kValueTransformerName
-                                   transformedValueClass: [NSNumber class]
-                      returningTransformedValueWithBlock:^id _Nonnull(id  _Nonnull value) {
-        // if it's not a number or convertable to one, IDK man
-        if (![value respondsToSelector: @selector(floatValue)]) return @0;
-        
-        long minutesValue = lroundf([value floatValue]);
-        return @(minutesValue);
-    }];
+    if ([NSValueTransformer valueTransformerForName: kValueTransformerName] != nil) return;
+    [NSValueTransformer setValueTransformer: [SCRoundedMinutesValueTransformer new]
+                                    forName: kValueTransformerName];
 }
 
 - (NSInteger)durationValueMinutes {
