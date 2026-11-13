@@ -12,10 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SCDurationSlider : NSSlider
 
 @property (nonatomic, assign) NSInteger maxDuration;
-@property (readonly) NSInteger durationValueMinutes;
+// the selected duration, snapped to the nearest stop on the slider's non-linear scale
+@property (nonatomic, assign) NSInteger durationValueMinutes;
 @property (readonly) NSString* durationDescription;
 
-- (NSInteger)durationValueMinutes;
 - (void)bindDurationToObject:(id)obj keyPath:(NSString*)keyPath;
 - (NSString*)durationDescription;
 
