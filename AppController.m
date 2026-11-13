@@ -64,11 +64,12 @@
 - (IBAction)updateTimeSliderDisplay:(id)sender {
     NSInteger numMinutes = [defaults_ integerForKey: @"BlockDuration"];
 
-    // if the duration is larger than we can display on our slider
-    // chop it down to our max display value so the user doesn't
-    // accidentally start a much longer block than intended
-    if (numMinutes > blockDurationSlider_.maxDuration) {
-        [self setDefaultsBlockDurationOnMainThread: @(floor(blockDurationSlider_.maxDuration))];
+    // the slider snaps to a fixed set of durations (and can't go past maxDuration), so if the
+    // saved duration isn't one the slider can show - e.g. a longer-than-max value, or one saved
+    // before the slider's scale changed - adopt the slider's value. That way the label always
+    // matches the block we'll actually start, and nobody starts a much longer block than intended.
+    if (numMinutes != blockDurationSlider_.durationValueMinutes) {
+        [self setDefaultsBlockDurationOnMainThread: @(blockDurationSlider_.durationValueMinutes)];
         numMinutes = [defaults_ integerForKey: @"BlockDuration"];
     }
 
