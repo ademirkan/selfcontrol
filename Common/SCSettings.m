@@ -8,8 +8,9 @@
 #import "SCSettings.h"
 #import <AppKit/AppKit.h>
 
-#ifndef TESTING
+#if !defined(TESTING) && __has_include(<Sentry/Sentry.h>)
 #import <Sentry/Sentry.h>
+#define SC_SENTRY_AVAILABLE 1
 #endif
 
 float const SYNC_INTERVAL_SECS = 30;
@@ -484,7 +485,7 @@ NSString* const SETTINGS_FILE_DIR = @"/usr/local/etc/";
                                                                  timeStyle: NSDateFormatterFullStyle];
     }
 
-#ifndef TESTING
+#ifdef SC_SENTRY_AVAILABLE
     [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
         [scope setContextValue: dictCopy forKey: @"SCSettings"];
     }];
