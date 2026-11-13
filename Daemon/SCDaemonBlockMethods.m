@@ -235,8 +235,7 @@ NSTimeInterval CHECKUP_LOCK_TIMEOUT = 0.5; // use a shorter lock timeout for che
     SCSettings* settings = [SCSettings sharedSettings];
     
     // this can only be used to *extend* the block end date - not shorten it!
-    // and we also won't let them extend by more than 24 hours at a time, for safety...
-    // TODO: they should be able to extend up to MaxBlockLength minutes, right?
+    // and we also won't let them extend by more than 30 days at a time, for safety...
     NSDate* currentEndDate = [settings valueForKey: @"BlockEndDate"];
     if ([newEndDate timeIntervalSinceDate: currentEndDate] < 0) {
         NSLog(@"ERROR: Can't update block end date to an earlier date");
@@ -244,13 +243,15 @@ NSTimeInterval CHECKUP_LOCK_TIMEOUT = 0.5; // use a shorter lock timeout for che
         [SCSentry captureError: err];
         reply(err);
         [self.daemonMethodLock unlock];
+        return;
     }
-    if ([newEndDate timeIntervalSinceDate: currentEndDate] > 86400) { // 86400 seconds = 1 day
-        NSLog(@"ERROR: Can't extend block end date by more than 1 day at a time");
+    if ([newEndDate timeIntervalSinceDate: currentEndDate] > 30 * 86400) { // 30 days
+        NSLog(@"ERROR: Can't extend block end date by more than 30 days at a time");
         NSError* err = [SCErr errorWithCode: 309];
         [SCSentry captureError: err];
         reply(err);
         [self.daemonMethodLock unlock];
+        return;
     }
     
     [settings setValue: newEndDate forKey: @"BlockEndDate"];

@@ -528,7 +528,7 @@
 }
 
 - (void)extendBlockTime:(NSInteger)minutesToAdd lock:(NSLock*)lock {
-    // sanity check: extending a block for 0 minutes is useless; 24 hour should be impossible
+    // sanity check: extending a block for 0 minutes is useless, and we cap extensions at MaxBlockLength
     NSInteger maxBlockLength = [defaults_ integerForKey: @"MaxBlockLength"];
     if(minutesToAdd < 1) return;
     if (minutesToAdd > maxBlockLength) {
