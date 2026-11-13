@@ -14,11 +14,16 @@
 
 @implementation SCSentry
 
+// Crash reporting is disabled in this fork: the original DSN belongs to the upstream
+// SelfControl project. To re-enable, set kSentryDSN to your own Sentry project's DSN.
+static NSString* const kSentryDSN = nil;
+
 //org.eyebeam.SelfControl
 + (void)startSentry:(NSString*)componentId {
 #ifndef TESTING
+    if (kSentryDSN == nil) return;
     [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
-        options.dsn = @"https://58fbe7145368418998067f88896007b2@o504820.ingest.sentry.io/5592195";
+        options.dsn = kSentryDSN;
         options.releaseName = [NSString stringWithFormat: @"%@%@", componentId, SELFCONTROL_VERSION_STRING];
         options.enableAutoSessionTracking = NO;
         options.environment = @"dev";
@@ -56,6 +61,8 @@
 
 // returns YES if we turned on error reporting based on the prompt return
 + (BOOL)showErrorReportingPromptIfNeeded {
+    // no point asking the user to enable error reporting when there's nowhere to send reports
+    if (kSentryDSN == nil) return NO;
     // no need to show the prompt if we're root (aka in the CLI/daemon), or already enabled error reporting, or if the user already dismissed it
     if (!geteuid()) return NO;
     if ([SCSentry errorReportingEnabled]) return NO;
