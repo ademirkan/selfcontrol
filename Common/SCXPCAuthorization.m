@@ -80,10 +80,11 @@ static NSDictionary* kAuthorizationRuleAuthenticateAsAdmin2MinTimeout;
             @"group": @"admin",
             @"timeout": @(120), // 2 minutes
             @"shared": @(YES),
-            @"version": @1, // not entirely sure what this does TBH
-            // Enable Touch ID and other biometric authentication on macOS 10.12.2+
-            // The authenticate mechanism supports Touch ID when available
-            @"mechanisms": @[@"builtin:authenticate"]
+            @"version": @1 // not entirely sure what this does TBH
+            // NOTE: don't set "mechanisms" here. Without it, macOS uses its standard admin
+            // prompt (which already supports Touch ID). Upstream once set it to just
+            // "builtin:authenticate", which shows the password dialog but never verifies the
+            // password - so every prompt failed. See +rightDefinitionIsBroken: below.
         };
     }
     
@@ -148,17 +149,28 @@ static NSDictionary* kAuthorizationRuleAuthenticateAsAdmin2MinTimeout;
     }];
 }
 
+// Rights created by builds containing upstream commit 34774c4 ("Add Touch ID support") list only
+// the non-privileged "builtin:authenticate" mechanism. That mechanism just shows the dialog; the
+// password is normally checked by a second, privileged "builtin:authenticate,privileged" step, which
+// was missing - so authentication always failed, no matter what password was entered.
++ (BOOL)rightDefinitionIsBroken:(NSDictionary*)definition {
+    return [definition[@"mechanisms"] isEqual: @[@"builtin:authenticate"]];
+}
+
 + (void)setupAuthorizationRights:(AuthorizationRef)authRef
     // See comment in header.
 {
     assert(authRef != NULL);
+    NSMutableDictionary<NSString*, NSArray*>* brokenRights = [NSMutableDictionary dictionary];
+
     [SCXPCAuthorization enumerateRightsUsingBlock:^(NSString * authRightName, id authRightDefault, NSString * authRightDesc) {
         OSStatus    blockErr;
+        CFDictionaryRef existingDefinition = NULL;
         
         // First get the right.  If we get back errAuthorizationDenied that means there's
         // no current definition, so we add our default one.
         
-        blockErr = AuthorizationRightGet([authRightName UTF8String], NULL);
+        blockErr = AuthorizationRightGet([authRightName UTF8String], &existingDefinition);
         if (blockErr == errAuthorizationDenied) {
             NSLog(@"setting auth right default for %@: %@", authRightName, authRightDefault);
             blockErr = AuthorizationRightSet(
@@ -170,13 +182,54 @@ static NSDictionary* kAuthorizationRuleAuthenticateAsAdmin2MinTimeout;
                 CFSTR("SCXPCAuthorization")                             // localeTableName
             );
             assert(blockErr == errAuthorizationSuccess);
+        } else if (blockErr == errAuthorizationSuccess && [SCXPCAuthorization rightDefinitionIsBroken: (__bridge NSDictionary*)existingDefinition]) {
+            brokenRights[authRightName] = @[authRightDefault, authRightDesc];
         } else {
             // A right already exists (err == noErr) or any other error occurs, we
             // assume that it has been set up in advance by the system administrator or
             // this is the second time we've run.  Either way, there's nothing more for
             // us to do.
         }
+
+        if (existingDefinition != NULL) CFRelease(existingDefinition);
     }];
+
+    if (brokenRights.count > 0) {
+        [SCXPCAuthorization repairBrokenRights: brokenRights authorization: authRef];
+    }
+}
+
++ (void)repairBrokenRights:(NSDictionary<NSString*, NSArray*>*)brokenRights authorization:(AuthorizationRef)authRef {
+    // Changing an existing right requires config.modify.<right name>, which uses the
+    // system's (working) admin prompt. Ask for all of them at once so the user sees one prompt.
+    NSArray<NSString*>* rightNames = brokenRights.allKeys;
+    NSMutableArray<NSString*>* configRightNames = [NSMutableArray arrayWithCapacity: rightNames.count];
+    AuthorizationItem* items = calloc(rightNames.count, sizeof(AuthorizationItem));
+    for (NSUInteger i = 0; i < rightNames.count; i++) {
+        [configRightNames addObject: [@"config.modify." stringByAppendingString: rightNames[i]]];
+        items[i].name = configRightNames[i].UTF8String;
+    }
+    AuthorizationRights configRights = { (UInt32)rightNames.count, items };
+    OSStatus err = AuthorizationCopyRights(authRef,
+                                           &configRights,
+                                           kAuthorizationEmptyEnvironment,
+                                           kAuthorizationFlagDefaults | kAuthorizationFlagInteractionAllowed | kAuthorizationFlagExtendRights,
+                                           NULL);
+    free(items);
+    if (err != errAuthorizationSuccess) {
+        NSLog(@"WARNING: couldn't get permission to repair authorization rights %@ (error %d); block changes will keep failing to authenticate", rightNames, (int)err);
+        return;
+    }
+
+    for (NSString* rightName in rightNames) {
+        err = AuthorizationRightSet(authRef,
+                                    rightName.UTF8String,
+                                    (__bridge CFTypeRef) brokenRights[rightName][0],
+                                    (__bridge CFStringRef) brokenRights[rightName][1],
+                                    NULL,
+                                    CFSTR("SCXPCAuthorization"));
+        NSLog(@"%@ broken auth right %@ (status %d)", (err == errAuthorizationSuccess) ? @"Repaired" : @"ERROR: failed to repair", rightName, (int)err);
+    }
 }
 
 + (NSString *)authorizationRightForCommand:(SEL)command

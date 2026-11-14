@@ -221,6 +221,27 @@
     }
 }
 
+// Asks for an authorization right here in the app, so the password prompt comes from SelfControl
+// itself. Our rights are "shared" with a 2-minute timeout, so the daemon's own check of the same
+// authorization then passes without prompting again (the same pattern installDaemon: uses for
+// startBlock). Returns nil on success.
+- (NSError*)preauthorizeRight:(const char*)rightName {
+    [self setupAuthorization];
+
+    AuthorizationItem item = { rightName, 0, NULL, 0 };
+    AuthorizationRights rights = { 1, &item };
+    OSStatus status = AuthorizationCopyRights(self->_authRef,
+                                              &rights,
+                                              kAuthorizationEmptyEnvironment,
+                                              kAuthorizationFlagDefaults | kAuthorizationFlagExtendRights | kAuthorizationFlagInteractionAllowed,
+                                              NULL);
+    if (status == errAuthorizationSuccess) return nil;
+    if (status == AUTH_CANCELLED_STATUS) return [SCErr errorWithCode: 1];
+
+    NSLog(@"ERROR: Failed to authorize %s with status %d", rightName, (int)status);
+    return [NSError errorWithDomain: NSOSStatusErrorDomain code: status userInfo: nil];
+}
+
 - (BOOL)connectionIsActive {
     return (self.daemonConnection != nil);
 }
@@ -308,6 +329,12 @@
 }
 
 - (void)updateBlocklist:(NSArray<NSString*>*)newBlocklist reply:(void(^)(NSError* error))reply {
+    NSError* authError = [self preauthorizeRight: "org.eyebeam.SelfControl.modifyBlock"];
+    if (authError != nil) {
+        reply(authError);
+        return;
+    }
+
     [self connectAndExecuteCommandBlock:^(NSError * connectError) {
         if (connectError != nil) {
             NSLog(@"Blocklist update failed with connection error: %@", connectError);
@@ -330,6 +357,12 @@
 }
 
 - (void)updateBlockEndDate:(NSDate*)newEndDate reply:(void(^)(NSError* error))reply {
+    NSError* authError = [self preauthorizeRight: "org.eyebeam.SelfControl.modifyBlock"];
+    if (authError != nil) {
+        reply(authError);
+        return;
+    }
+
     [self connectAndExecuteCommandBlock:^(NSError * connectError) {
         if (connectError != nil) {
             NSLog(@"Block end date update failed with connection error: %@", connectError);
