@@ -57,6 +57,9 @@ OSStatus const AUTH_CANCELLED_STATUS = -60006;
             @"BlockSound": @5,
             @"ClearCaches": @YES,
             @"AllowLocalNetworks": @YES,
+            // force these DNS servers during blocks (Cloudflare for Families: blocks malware + adult content)
+            @"EnforceDNS": @YES,
+            @"EnforcedDNSServers": @[@"1.1.1.3", @"1.0.0.3", @"2606:4700:4700::1113", @"2606:4700:4700::1003"],
             // if the user has checked the box to "send crash reports to third-party developers", we'll default Sentry on
             // otherwise it defaults off, but we'll still prompt to ask them if we can send data
             @"EnableErrorReporting": @([SCMiscUtilities systemThirdPartyCrashReportingEnabled]),

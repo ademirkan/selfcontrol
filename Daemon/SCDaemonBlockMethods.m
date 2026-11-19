@@ -13,6 +13,7 @@
 #import "SCDaemon.h"
 #import "LaunchctlHelper.h"
 #import "HostFileBlockerSet.h"
+#import "SCDNSEnforcer.h"
 
 NSTimeInterval METHOD_LOCK_TIMEOUT = 5.0;
 NSTimeInterval CHECKUP_LOCK_TIMEOUT = 0.5; // use a shorter lock timeout for checkups, because we'd prefer not to have tons pile up
@@ -89,6 +90,8 @@ NSTimeInterval CHECKUP_LOCK_TIMEOUT = 0.5; // use a shorter lock timeout for che
     // update all the settings for the block, which we're basically just copying from defaults to settings
     [settings setValue: blockSettings[@"ClearCaches"] forKey: @"ClearCaches"];
     [settings setValue: blockSettings[@"AllowLocalNetworks"] forKey: @"AllowLocalNetworks"];
+    [settings setValue: blockSettings[@"EnforceDNS"] forKey: @"EnforceDNS"];
+    [settings setValue: blockSettings[@"EnforcedDNSServers"] forKey: @"EnforcedDNSServers"];
     [settings setValue: blockSettings[@"EvaluateCommonSubdomains"] forKey: @"EvaluateCommonSubdomains"];
     [settings setValue: blockSettings[@"IncludeLinkedDomains"] forKey: @"IncludeLinkedDomains"];
     [settings setValue: blockSettings[@"BlockSoundShouldPlay"] forKey: @"BlockSoundShouldPlay"];
@@ -381,6 +384,9 @@ NSTimeInterval CHECKUP_LOCK_TIMEOUT = 0.5; // use a shorter lock timeout for che
 
         [SCSentry addBreadcrumb: @"Daemon found compromised block integrity and re-added rules" category: @"daemon"];
         NSLog(@"INFO: Integrity check ran; readded block rules.");
+    } else if ([settings boolForKey: @"EnforceDNS"] && [SCDNSEnforcer enforceDNSServers: [settings valueForKey: @"EnforcedDNSServers"]]) {
+        // someone changed the DNS servers (or a new network adapter showed up) - put ours back
+        NSLog(@"INFO: Integrity check ran; DNS settings had changed and were re-applied.");
     } else NSLog(@"INFO: Integrity check ran; no action needed.");
     
     [self.daemonMethodLock unlock];

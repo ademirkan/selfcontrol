@@ -619,6 +619,8 @@
                                              blockSettings: @{
                                                                 @"ClearCaches": [self->defaults_ valueForKey: @"ClearCaches"],
                                                                 @"AllowLocalNetworks": [self->defaults_ valueForKey: @"AllowLocalNetworks"],
+                                                                @"EnforceDNS": [self->defaults_ valueForKey: @"EnforceDNS"],
+                                                                @"EnforcedDNSServers": [self->defaults_ valueForKey: @"EnforcedDNSServers"],
                                                                 @"EvaluateCommonSubdomains": [self->defaults_ valueForKey: @"EvaluateCommonSubdomains"],
                                                                 @"IncludeLinkedDomains": [self->defaults_ valueForKey: @"IncludeLinkedDomains"],
                                                                 @"BlockSoundShouldPlay": [self->defaults_ valueForKey: @"BlockSoundShouldPlay"],

@@ -132,6 +132,8 @@ int main(int argc, char* argv[]) {
             NSDictionary* blockSettingsFromDefaults = @{
                 @"ClearCaches": defaultsDict[@"ClearCaches"],
                 @"AllowLocalNetworks": defaultsDict[@"AllowLocalNetworks"],
+                @"EnforceDNS": defaultsDict[@"EnforceDNS"],
+                @"EnforcedDNSServers": defaultsDict[@"EnforcedDNSServers"],
                 @"EvaluateCommonSubdomains": defaultsDict[@"EvaluateCommonSubdomains"],
                 @"IncludeLinkedDomains": defaultsDict[@"IncludeLinkedDomains"],
                 @"BlockSoundShouldPlay": defaultsDict[@"BlockSoundShouldPlay"],

@@ -26,6 +26,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #import "HostFileBlockerSet.h"
+#import "SCDNSEnforcer.h"
 
 @implementation BlockManager
 
@@ -123,6 +124,12 @@ BOOL appendMode = NO;
 		[hostBlockerSet writeNewFileContents];
 	}
 
+	NSArray<NSString*>* dnsServers = [SCDNSEnforcer validDNSServersFromArray: self.enforcedDNSServers];
+	if (dnsServers.count > 0) {
+		[SCDNSEnforcer enforceDNSServers: dnsServers];
+		pf.allowedDNSServers = dnsServers;
+	}
+
 	[pf startBlock];
 }
 
@@ -210,6 +217,8 @@ BOOL appendMode = NO;
 }
 
 - (BOOL)clearBlock {
+	[SCDNSEnforcer restoreOriginalDNSServers];
+
 	[pf stopBlock: false];
 	BOOL pfSuccess = ![pf containsSelfControlBlock];
 
@@ -253,6 +262,8 @@ BOOL appendMode = NO;
 }
 
 - (BOOL)forceClearBlock {
+	[SCDNSEnforcer restoreOriginalDNSServers];
+
 	[pf stopBlock: YES];
 	BOOL pfSuccess = ![pf containsSelfControlBlock];
 
