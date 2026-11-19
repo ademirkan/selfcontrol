@@ -45,6 +45,13 @@ NSFileHandle* appendFileHandle;
 	 "# org.eyebeam ruleset for SelfControl blocks\n"
 	 "#\n"];
 
+	if (self.allowedDNSServers.count > 0) {
+		// "quick" makes this win over the allowlist footer's "pass ... port 53" rules
+		[configText appendFormat: @"table <selfcontrol_dns> const { %@ }\n"
+		 "block return out quick proto { tcp udp } from any to ! <selfcontrol_dns> port { 53 853 }\n"
+		 "\n", [self.allowedDNSServers componentsJoinedByString: @" "]];
+	}
+
 	if (isAllowlist) {
 		[configText appendString: @"block return out proto tcp from any to any\n"
 		 "block return out proto udp from any to any\n"

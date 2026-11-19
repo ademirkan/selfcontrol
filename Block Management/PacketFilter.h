@@ -17,6 +17,10 @@
 
 + (BOOL)blockFoundInPF;
 
+// If set, the block also drops all DNS traffic (port 53, and DNS-over-TLS on 853) that isn't
+// going to one of these servers. Entries must be valid IP addresses (see SCDNSEnforcer).
+@property (nonatomic, copy) NSArray<NSString*>* allowedDNSServers;
+
 - (PacketFilter*)initAsAllowlist: (BOOL)allowlist;
 - (void)addBlockHeader:(NSMutableString*)configText;
 - (void)addAllowlistFooter:(NSMutableString*)configText;

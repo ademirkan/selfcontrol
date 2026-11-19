@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		40CB6DC8898A0570019645A6 /* SCDNSEnforcer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B4A9227EC603B5E77E1AAE /* SCDNSEnforcer.m */; };
 		5E6BEEBB5C6E29DADDB344CF /* libPods-selfcontrol-cli.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85A094F15E20A0DB58665A8 /* libPods-selfcontrol-cli.a */; };
 		63BAC9E58A69B15D342B0E29 /* libPods-org.eyebeam.selfcontrold.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BF3973D41997900DF147B24 /* libPods-org.eyebeam.selfcontrold.a */; };
 		8CA8987104D2956493D6AF6B /* Pods_SelfControl_SelfControlTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F41DEF1E3926B4CF3AE2B76C /* Pods_SelfControl_SelfControlTests.framework */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		C61456D29C81A0C27625F202 /* SCDNSEnforcer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B4A9227EC603B5E77E1AAE /* SCDNSEnforcer.m */; };
 		CB0385E119D77051004614B6 /* PreferencesAdvancedViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB0385DD19D77051004614B6 /* PreferencesAdvancedViewController.xib */; };
 		CB0385E219D77051004614B6 /* PreferencesGeneralViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB0385DF19D77051004614B6 /* PreferencesGeneralViewController.xib */; };
 		CB066F6C2652037E0076964D /* HostFileBlocker.m in Sources */ = {isa = PBXBuildFile; fileRef = CBB0AE290FA74566006229B3 /* HostFileBlocker.m */; };
@@ -206,9 +208,11 @@
 		CBED7D9925ABB911003080D6 /* selfcontrol-cli in Copy Executable Helper Tools */ = {isa = PBXBuildFile; fileRef = CBA2AFD20F39EC12005AFEBE /* selfcontrol-cli */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		CBEE50C10F48C21F00F5DF1C /* TimerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CBEE50C00F48C21F00F5DF1C /* TimerWindowController.m */; };
 		CBF3B574217BADD7006D5F52 /* SCSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = CBF3B573217BADD7006D5F52 /* SCSettings.m */; };
+		D17F71DB102881462A33823A /* SCDNSEnforcer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B4A9227EC603B5E77E1AAE /* SCDNSEnforcer.m */; };
 		D4EDD26C770910569C31D36F /* libPods-SCKillerHelper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AF899A50A17F0C6C8C6B84A2 /* libPods-SCKillerHelper.a */; };
 		DC4DBA9148D8D67A11899C5E /* Pods_SelfControl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EBDE7B29D92764A409E4FDA /* Pods_SelfControl.framework */; };
 		E263B809965135813A557CD5 /* Pods_SelfControl_Killer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86DAD6532C67CBE72E99084C /* Pods_SelfControl_Killer.framework */; };
+		E449654864E01E3CC4DA4B2E /* SCDNSEnforcer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B4A9227EC603B5E77E1AAE /* SCDNSEnforcer.m */; };
 		F5B8CBEE19EE21C30026F3A5 /* SCTimeIntervalFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = F5B8CBED19EE21C30026F3A5 /* SCTimeIntervalFormatter.m */; };
 /* End PBXBuildFile section */
 
@@ -548,6 +552,7 @@
 		AF899A50A17F0C6C8C6B84A2 /* libPods-SCKillerHelper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SCKillerHelper.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C72025F2499F9F07E281CB50 /* Pods-SelfControl-SelfControlTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SelfControl-SelfControlTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SelfControl-SelfControlTests/Pods-SelfControl-SelfControlTests.release.xcconfig"; sourceTree = "<group>"; };
 		C85A094F15E20A0DB58665A8 /* libPods-selfcontrol-cli.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-selfcontrol-cli.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8B4A9227EC603B5E77E1AAE /* SCDNSEnforcer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = SCDNSEnforcer.m; sourceTree = "<group>"; };
 		CB0EEF5D20FD8CE00024D27B /* SelfControlTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SelfControlTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB0EEF6120FD8CE00024D27B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CB0EEF7720FE49020024D27B /* SCUtilityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SCUtilityTests.m; sourceTree = "<group>"; };
@@ -1464,6 +1469,7 @@
 		CBF3B572217BADD7006D5F52 /* SCSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SCSettings.h; sourceTree = "<group>"; };
 		CBF3B573217BADD7006D5F52 /* SCSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SCSettings.m; sourceTree = "<group>"; };
 		D0BABA9759C378EE7C619F91 /* Pods-SCKillerHelper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SCKillerHelper.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SCKillerHelper/Pods-SCKillerHelper.debug.xcconfig"; sourceTree = "<group>"; };
+		DF68A6F02B7DDD5AACABAD81 /* SCDNSEnforcer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = SCDNSEnforcer.h; sourceTree = "<group>"; };
 		E1139D5A5B92C88FFF62718F /* Pods-SCKillerHelper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SCKillerHelper.release.xcconfig"; path = "Pods/Target Support Files/Pods-SCKillerHelper/Pods-SCKillerHelper.release.xcconfig"; sourceTree = "<group>"; };
 		E3346B8A670C55C686428776 /* Pods-SelfControl-SelfControlTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SelfControl-SelfControlTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SelfControl-SelfControlTests/Pods-SelfControl-SelfControlTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EBDF1B23AA44B10313D79203 /* Pods-SelfControl Killer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SelfControl Killer.release.xcconfig"; path = "Pods/Target Support Files/Pods-SelfControl Killer/Pods-SelfControl Killer.release.xcconfig"; sourceTree = "<group>"; };
@@ -1781,6 +1787,8 @@
 				CB90BF820F49F430006D202D /* HostImporter.m */,
 				CB73615E19E4FDA000E0924F /* AllowlistScraper.h */,
 				CB73615F19E4FDA000E0924F /* AllowlistScraper.m */,
+				C8B4A9227EC603B5E77E1AAE /* SCDNSEnforcer.m */,
+				DF68A6F02B7DDD5AACABAD81 /* SCDNSEnforcer.h */,
 			);
 			path = "Block Management";
 			sourceTree = "<group>";
@@ -3828,6 +3836,7 @@
 				CB114284222CD4F0004B7868 /* SCSettings.m in Sources */,
 				CB0EEF7820FE49030024D27B /* SCUtilityTests.m in Sources */,
 				CB81A94D25B7B5B6006956F7 /* SCMigrationUtilities.m in Sources */,
+				E449654864E01E3CC4DA4B2E /* SCDNSEnforcer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3861,6 +3870,7 @@
 				CB69C4EF25A3FD8A0030CFCD /* SCXPCAuthorization.m in Sources */,
 				CB62FC4324B1329500ADBC40 /* PacketFilter.m in Sources */,
 				CB62FC4224B1329200ADBC40 /* BlockManager.m in Sources */,
+				40CB6DC8898A0570019645A6 /* SCDNSEnforcer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3912,6 +3922,7 @@
 				CBB1731B20F05C09007FCAE9 /* SCMiscUtilities.m in Sources */,
 				CB81A9F625B7C5F7006956F7 /* SCBlockFileReaderWriter.m in Sources */,
 				CB5888E425F60DC500B5C64D /* HostFileBlockerSet.m in Sources */,
+				C61456D29C81A0C27625F202 /* SCDNSEnforcer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3954,6 +3965,7 @@
 				CB25806716C237F10059C99A /* NSString+IPAddress.m in Sources */,
 				CB1465B925B027E700130D2E /* SCErr.m in Sources */,
 				CBB1731520F041F4007FCAE9 /* SCMiscUtilities.m in Sources */,
+				D17F71DB102881462A33823A /* SCDNSEnforcer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

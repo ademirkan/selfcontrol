@@ -44,6 +44,9 @@
 - (BlockManager*)initAsAllowlist:(BOOL)allowlist allowLocal:(BOOL)local includeCommonSubdomains:(BOOL)blockCommon;
 - (BlockManager*)initAsAllowlist:(BOOL)allowlist allowLocal:(BOOL)local includeCommonSubdomains:(BOOL)blockCommon includeLinkedDomains:(BOOL)includeLinked;
 
+// DNS servers to force while the block runs (see SCDNSEnforcer). Set before finalizeBlock.
+@property (nonatomic, copy) NSArray<NSString*>* enforcedDNSServers;
+
 - (void)enterAppendMode;
 - (void)finishAppending;
 - (void)prepareToAddBlock;

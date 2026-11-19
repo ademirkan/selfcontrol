@@ -95,6 +95,8 @@ NSString* const SETTINGS_FILE_DIR = @"/usr/local/etc/";
         @"BlockSound": @5,
         @"ClearCaches": @YES,
         @"AllowLocalNetworks": @YES,
+        @"EnforceDNS": @NO,
+        @"EnforcedDNSServers": @[],
 
         @"EnableErrorReporting": @([SCMiscUtilities systemThirdPartyCrashReportingEnabled]),
 

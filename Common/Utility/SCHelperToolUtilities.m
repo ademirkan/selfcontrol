@@ -24,6 +24,10 @@
 
     NSLog(@"About to run BlockManager commands");
     
+    if ([settings boolForKey: @"EnforceDNS"]) {
+        blockManager.enforcedDNSServers = [settings valueForKey: @"EnforcedDNSServers"];
+    }
+
     [blockManager prepareToAddBlock];
     [blockManager addBlockEntriesFromStrings: [settings valueForKey: @"ActiveBlocklist"]];
     [blockManager finalizeBlock];
