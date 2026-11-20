@@ -31,6 +31,8 @@
 "307" = "SelfControl couldn't extend the block duration because no block is currently running.";
 "308" = "SelfControl won't update the block to end at an earlier date - it can only be extended.";
 "309" = "SelfControl won't extend the block by more than 30 days at a time.";
+"320" = "Can't turn on DNS enforcement because no block is running.";
+"321" = "Can't turn on DNS enforcement because none of the DNS servers are valid IP addresses.";
 "310" = "There was an error switching alert sounds because that sound name is unknown.";
 "310" = "There was an error switching alert sounds because the system couldn't find that sound.";
 

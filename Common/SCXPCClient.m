@@ -384,6 +384,28 @@
     }];
 }
 
+- (void)enforceDNSServersForRunningBlock:(NSArray<NSString*>*)servers reply:(void(^)(NSError* error))reply {
+    [self connectAndExecuteCommandBlock:^(NSError * connectError) {
+        if (connectError != nil) {
+            NSLog(@"Enforcing DNS failed with connection error: %@", connectError);
+            reply(connectError);
+        } else {
+            [[self.daemonConnection remoteObjectProxyWithErrorHandler:^(NSError * proxyError) {
+                NSLog(@"Enforcing DNS failed with remote object proxy error: %@", proxyError);
+                reply(proxyError);
+            }] enforceDNSServersForRunningBlock: servers reply:^(NSError* error) {
+                if (error != nil) NSLog(@"Enforcing DNS failed with error = %@\n", error);
+                reply(error);
+            }];
+        }
+    }];
+}
+
+- (BOOL)installedDaemonDiffersFromBundled {
+    return ![[NSFileManager defaultManager] contentsEqualAtPath: @"/Library/PrivilegedHelperTools/org.eyebeam.selfcontrold"
+                                                        andPath: [self selfControlHelperToolPath]];
+}
+
 - (NSString*)selfControlHelperToolPath {
     static NSString* path;
 

@@ -33,5 +33,7 @@
 - (void)enterAppendMode;
 - (void)finishAppending;
 - (int)refreshPFRules;
+// Adds the allowedDNSServers rules to the block that's already running, and reloads pf.
+- (void)appendDNSRulesToCurrentBlock;
 
 @end
