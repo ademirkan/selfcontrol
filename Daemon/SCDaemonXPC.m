@@ -65,6 +65,11 @@
     [SCDaemonBlockMethods updateBlockEndDate: newEndDate authorization: authData reply: reply];
 }
 
+- (void)enforceDNSServersForRunningBlock:(NSArray<NSString*>*)servers reply:(void(^)(NSError* error))reply {
+    NSLog(@"XPC method called: enforceDNSServersForRunningBlock");
+    [SCDaemonBlockMethods enforceDNSServersForRunningBlock: servers reply: reply];
+}
+
 // Part of the HelperToolProtocol.  Returns the version number of the tool.  Note that never
 // requires authorization.
 - (void)getVersionWithReply:(void(^)(NSString * version))reply {

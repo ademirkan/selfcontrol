@@ -45,12 +45,7 @@ NSFileHandle* appendFileHandle;
 	 "# org.eyebeam ruleset for SelfControl blocks\n"
 	 "#\n"];
 
-	if (self.allowedDNSServers.count > 0) {
-		// "quick" makes this win over the allowlist footer's "pass ... port 53" rules
-		[configText appendFormat: @"table <selfcontrol_dns> const { %@ }\n"
-		 "block return out quick proto { tcp udp } from any to ! <selfcontrol_dns> port { 53 853 }\n"
-		 "\n", [self.allowedDNSServers componentsJoinedByString: @" "]];
-	}
+	[configText appendString: [self dnsRules]];
 
 	if (isAllowlist) {
 		[configText appendString: @"block return out proto tcp from any to any\n"
@@ -58,6 +53,28 @@ NSFileHandle* appendFileHandle;
 		 "\n"];
 	}
 }
+// "quick" rules take effect wherever they are in the anchor (and win over the allowlist footer's
+// "pass ... port 53" rules), so these work both in the header and appended to a running block.
+- (NSString*)dnsRules {
+	if (self.allowedDNSServers.count == 0) return @"";
+	NSString* servers = [self.allowedDNSServers componentsJoinedByString: @" "];
+	return [NSString stringWithFormat: @"pass out quick proto { tcp udp } from any to { %@ } port { 53 853 }\n"
+			"block return out quick proto { tcp udp } from any to any port { 53 853 }\n"
+			"\n", servers];
+}
+
+- (void)appendDNSRulesToCurrentBlock {
+	NSFileHandle* fileHandle = [NSFileHandle fileHandleForWritingAtPath: @"/etc/pf.anchors/org.eyebeam"];
+	if (!fileHandle) {
+		NSLog(@"ERROR: Failed to get handle for pf.anchors file while attempting to append DNS rules");
+		return;
+	}
+	[fileHandle seekToEndOfFile];
+	[fileHandle writeData: [[@"\n" stringByAppendingString: [self dnsRules]] dataUsingEncoding: NSUTF8StringEncoding]];
+	[fileHandle closeFile];
+	[self refreshPFRules];
+}
+
 - (void)addAllowlistFooter:(NSMutableString*)configText {
 	[configText appendString: @"pass out proto tcp from any to any port 53\n"];
 	[configText appendString: @"pass out proto udp from any to any port 53\n"];

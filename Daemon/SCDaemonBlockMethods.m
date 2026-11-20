@@ -276,6 +276,50 @@ NSTimeInterval CHECKUP_LOCK_TIMEOUT = 0.5; // use a shorter lock timeout for che
     [self.daemonMethodLock unlock];
 }
 
++ (void)enforceDNSServersForRunningBlock:(NSArray<NSString*>*)servers reply:(void(^)(NSError* error))reply {
+    if (![SCDaemonBlockMethods lockOrTimeout: reply]) {
+        return;
+    }
+
+    if (![SCBlockUtilities modernBlockIsRunning]) {
+        NSLog(@"ERROR: Can't enforce DNS since no block is running");
+        reply([SCErr errorWithCode: 320]);
+        [self.daemonMethodLock unlock];
+        return;
+    }
+    NSArray<NSString*>* validServers = [SCDNSEnforcer validDNSServersFromArray: servers];
+    if (validServers.count == 0) {
+        NSLog(@"ERROR: Can't enforce DNS since no valid DNS servers were given (%@)", servers);
+        reply([SCErr errorWithCode: 321]);
+        [self.daemonMethodLock unlock];
+        return;
+    }
+
+    SCSettings* settings = [SCSettings sharedSettings];
+    if ([settings boolForKey: @"EnforceDNS"]) {
+        NSLog(@"INFO: DNS is already enforced for this block, nothing to do.");
+    } else {
+        [settings setValue: @YES forKey: @"EnforceDNS"];
+        [settings setValue: validServers forKey: @"EnforcedDNSServers"];
+
+        [SCDNSEnforcer enforceDNSServers: validServers];
+        PacketFilter* pf = [[PacketFilter alloc] initAsAllowlist: [settings boolForKey: @"ActiveBlockAsWhitelist"]];
+        pf.allowedDNSServers = validServers;
+        [pf appendDNSRulesToCurrentBlock];
+
+        NSError* syncErr = [settings syncSettingsAndWait: 5];
+        if (syncErr != nil) {
+            NSLog(@"WARNING: Sync failed or timed out with error %@ after enforcing DNS", syncErr);
+        }
+        [SCHelperToolUtilities sendConfigurationChangedNotification];
+        NSLog(@"INFO: DNS servers %@ now enforced for the running block.", validServers);
+    }
+    reply(nil);
+
+    [[SCDaemon sharedDaemon] resetInactivityTimer];
+    [self.daemonMethodLock unlock];
+}
+
 + (void)checkupBlock {
     if (![SCDaemonBlockMethods lockOrTimeout: nil timeout: CHECKUP_LOCK_TIMEOUT]) {
         return;

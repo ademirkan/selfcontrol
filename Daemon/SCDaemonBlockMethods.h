@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)startBlockWithControllingUID:(uid_t)controllingUID blocklist:(NSArray<NSString*>*)blocklist isAllowlist:(BOOL)isAllowlist endDate:(NSDate*)endDate blockSettings:(NSDictionary*)blockSettings authorization:(NSData *)authData reply:(void(^)(NSError* error))reply;
 
 // Checks whether the block is expired or compromised, and takes action to fix
++ (void)enforceDNSServersForRunningBlock:(NSArray<NSString*>*)servers reply:(void(^)(NSError* error))reply;
 + (void)checkupBlock;
 
 // updates the blocklist for the currently running block

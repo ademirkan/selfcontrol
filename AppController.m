@@ -381,6 +381,9 @@
                     } else {
                         [SCSentry addBreadcrumb: @"Detected up-to-date daemon" category:@"app"];
                         NSLog(@"Daemon version of %@ is up-to-date!", daemonVersion);
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self offerDNSEnforcementForRunningBlockIfNeeded];
+                        });
                     }
                 } else {
                     NSLog(@"ERROR: Fetching daemon version failed with error %@", error);
@@ -434,6 +437,56 @@
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
     [settings_ synchronizeSettings];
+}
+
+// Blocks started before DNS enforcement existed (or with it turned off) don't force DNS. If the
+// user has it turned on now, offer to add it to the running block. Older helpers don't know how
+// to do that, so this may first need to update the helper (which asks for an admin password).
+- (void)offerDNSEnforcementForRunningBlockIfNeeded {
+    if (![SCBlockUtilities modernBlockIsRunning] || ![defaults_ boolForKey: @"EnforceDNS"] || [settings_ boolForKey: @"EnforceDNS"]) {
+        return;
+    }
+    NSDate* blockEndDate = [settings_ valueForKey: @"BlockEndDate"];
+    if ([[defaults_ objectForKey: @"DNSEnforcementOfferDeclinedForBlockEnding"] isEqual: blockEndDate]) {
+        return;
+    }
+
+    BOOL needsNewHelper = [self.xpc installedDaemonDiffersFromBundled];
+    NSAlert* alert = [[NSAlert alloc] init];
+    alert.messageText = NSLocalizedString(@"Force family-safe DNS for your current block?", nil);
+    alert.informativeText = [NSString stringWithFormat: @"%@%@",
+                             NSLocalizedString(@"Your current block doesn't force DNS yet. Turning it on switches your DNS to Cloudflare for Families (1.1.1.3) and blocks other DNS servers until the block ends.", nil),
+                             needsNewHelper ? NSLocalizedString(@"\n\nmacOS will ask for an administrator password to update SelfControl's helper. Your block stays on while it updates.", nil) : @""];
+    [alert addButtonWithTitle: NSLocalizedString(@"Turn On", nil)];
+    [alert addButtonWithTitle: NSLocalizedString(@"Not Now", nil)];
+    if ([alert runModal] != NSAlertFirstButtonReturn) {
+        // don't ask again for this block
+        [defaults_ setObject: blockEndDate forKey: @"DNSEnforcementOfferDeclinedForBlockEnding"];
+        return;
+    }
+
+    void (^enforce)(void) = ^{
+        [self.xpc enforceDNSServersForRunningBlock: [self->defaults_ arrayForKey: @"EnforcedDNSServers"] reply:^(NSError * _Nonnull error) {
+            if (error != nil) {
+                [SCUIUtilities presentError: error];
+            } else {
+                NSLog(@"DNS enforcement turned on for the running block");
+            }
+        }];
+    };
+
+    if (!needsNewHelper) {
+        enforce();
+        return;
+    }
+    [self.xpc installDaemon:^(NSError * _Nonnull error) {
+        if (error != nil) {
+            if (![SCMiscUtilities errorIsAuthCanceled: error]) [SCUIUtilities presentError: error];
+            return;
+        }
+        NSLog(@"Updated daemon so it can enforce DNS for the running block");
+        [self.xpc refreshConnectionAndRun: enforce];
+    }];
 }
 
 - (void)reinstallDaemon {

@@ -22,6 +22,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)startBlockWithControllingUID:(uid_t)controllingUID blocklist:(NSArray<NSString*>*)blocklist isAllowlist:(BOOL)isAllowlist endDate:(NSDate*)endDate blockSettings:(NSDictionary*)blockSettings reply:(void(^)(NSError* error))reply;
 - (void)updateBlocklist:(NSArray<NSString*>*)newBlocklist reply:(void(^)(NSError* error))reply;
 - (void)updateBlockEndDate:(NSDate*)newEndDate reply:(void(^)(NSError* error))reply;
+- (void)enforceDNSServersForRunningBlock:(NSArray<NSString*>*)servers reply:(void(^)(NSError* error))reply;
+
+// YES if the helper installed in /Library/PrivilegedHelperTools is a different build than the one inside
+// this app (version numbers alone can't tell builds of the same version apart).
+- (BOOL)installedDaemonDiffersFromBundled;
 
 @end
 
